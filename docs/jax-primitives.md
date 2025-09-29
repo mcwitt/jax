@@ -46,7 +46,7 @@ Consider the following example: you want to add to JAX support for a multiply-ad
 (using-existing-jax-primitives)=
 ## Using existing JAX primitives
 
-The easiest way to define new functions is to write them in terms of JAX primitives, or in terms of other functions that are themselves written using JAX primitives, for example, those defined in the {func}`jax.lax` module:
+The easiest way to define new functions is to write them in terms of JAX primitives, or in terms of other functions that are themselves written using JAX primitives, for example, those defined in the {mod}`jax.lax` module:
 
 ```{code-cell}
 from jax._src.lax import lax
@@ -140,7 +140,7 @@ class expectNotImplementedError(object):
       return False
 ```
 
-Instead of using {func}`jax.lax` primitives directly, you can use other functions
+Instead of using {mod}`jax.lax` primitives directly, you can use other functions
 that are already written in terms of those primitives, such as those in `jax.numpy`:
 
 ```{code-cell}
