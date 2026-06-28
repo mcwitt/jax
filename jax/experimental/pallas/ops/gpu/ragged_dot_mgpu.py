@@ -103,7 +103,13 @@ def ragged_dot(
     transpose_rhs: bool = False,
     load_group_sizes_to_register: bool = True,
 ) -> jax.Array:
-  if lhs.dtype != rhs.dtype:
+  # lhs and rhs share a dtype, except that the e4m3/e5m2 FP8 pair may be mixed:
+  # Hopper `wgmma` takes independent `.atype`/`.btype` FP8 operands (the dgrad of
+  # the TE-style hybrid is e5m2-grad x e4m3-rhs). Mirrors the relaxation in
+  # `jax/_src/pallas/mosaic_gpu/primitives.py:wgmma` and the Mosaic dialect verifier.
+  _fp8_dtypes = (jnp.float8_e4m3fn, jnp.float8_e5m2)
+  _is_mixed_fp8 = lhs.dtype in _fp8_dtypes and rhs.dtype in _fp8_dtypes
+  if lhs.dtype != rhs.dtype and not _is_mixed_fp8:
     raise NotImplementedError(
         f"lhs and rhs must have the same dtype, got {lhs.dtype} and {rhs.dtype}"
     )
