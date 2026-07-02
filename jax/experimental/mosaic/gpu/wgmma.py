@@ -147,6 +147,7 @@ def wgmma_m64(
   f8e4m3fn = ir.Float8E4M3FNType.get()
   if b_k_stride % 16:
     raise ValueError
+  assert bytewidth(a_element_type) == bytewidth(b_element_type)
   # Only 16-bit types support transposes
   supports_transpose = bytewidth(b_element_type) == 2
   if not supports_transpose and (a_transpose or b_transpose):
