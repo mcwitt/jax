@@ -652,8 +652,9 @@ class DialectTest(MosaicGpuTest):
       self.module.operation.verify()
 
   def test_wgmma_mixed_fp8_operands_are_allowed(self):
-    # The e4m3/e5m2 FP8 pair may be mixed across `a` and `b` (PTX `wgmma` takes
-    # independent `.atype`/`.btype`), unlike other element-type mismatches.
+    if jtu.jaxlib_version() < (0, 11, 0):
+      self.skipTest("Mixed FP8 wgmma operands require a newer jaxlib verifier")
+
     e4m3 = ir.Float8E4M3FNType.get()
     e5m2 = ir.Float8E5M2Type.get()
     with ir.InsertionPoint(self.module.body):
