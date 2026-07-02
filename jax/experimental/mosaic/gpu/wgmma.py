@@ -365,14 +365,14 @@ def wgmma(
         "WGMMA requires A and B to have the same contraction dimension (K),"
         f" got: {k2} and {k}"
     )
-  is_mixed_fp8 = (
+  both_fp8 = (
       isinstance(element_type, SUPPORTED_F8_TYPES)
       and isinstance(element_type2, SUPPORTED_F8_TYPES)
   )
   # A and B must share an element type, except that the e4m3/e5m2 FP8 pair may
   # be mixed (PTX `wgmma` takes independent `.atype`/`.btype`). See
   # https://docs.nvidia.com/cuda/parallel-thread-execution/#asynchronous-warpgroup-level-matrix-instructions-wgmma-mma
-  if element_type != element_type2 and not is_mixed_fp8:
+  if element_type != element_type2 and not both_fp8:
     raise ValueError(
         "WGMMA requires A and B to have the same element type (or be a mix of"
         f" the e4m3/e5m2 FP8 types), got: {element_type2} and {element_type}"
