@@ -4546,8 +4546,6 @@ class PallasCallSm90ATest(PallasSm90ATest):
       (jnp.float8_e5m2, jnp.float8_e4m3fn),
   )
   def test_wgmma_mixed_fp8(self, lhs_dtype, rhs_dtype):
-    # PTX `wgmma` takes independent `.atype`/`.btype`, so the e4m3/e5m2 FP8 pair
-    # may be mixed across the two operands.
     m, k, n = 64, 128, 64
 
     def kernel(a_ref, b_ref, o_ref):
