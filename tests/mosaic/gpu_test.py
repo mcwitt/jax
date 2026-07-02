@@ -1290,20 +1290,18 @@ class WGMMATest(TestCase):
       nvvm.wgmma_wait_group_sync_aligned(0)
       acc.value.store_untiled(out, optimized=False)
 
-    def quantize(x, exponent_bits, mantissa_bits):
-      # Quantize the input to avoid rounding when feeding the WGMMA
-      return jax.lax.reduce_precision(x, exponent_bits, mantissa_bits)
-
     x_shape = (k, m) if lhs_transpose else (m, k)
     y_shape = (n, k) if rhs_transpose else (k, n)
     if in_mlir_dtype_cls == I8Type:
       x = self.prng.integers(-128, 127, x_shape).astype(in_jax_dtype)
       y = self.prng.integers(-128, 127, y_shape).astype(rhs_in_jax_dtype)
     else:
-      x = quantize(self.prng.uniform(-1, 1, x_shape),
-                   exponent_bits, mantissa_bits).astype(in_jax_dtype)
-      y = quantize(self.prng.uniform(-1, 1, y_shape),
-                   rhs_exponent_bits, rhs_mantissa_bits).astype(rhs_in_jax_dtype)
+      x = jax.lax.reduce_precision(
+        self.prng.uniform(-1, 1, x_shape), exponent_bits, mantissa_bits
+      ).astype(in_jax_dtype)
+      y = jax.lax.reduce_precision(
+        self.prng.uniform(-1, 1, y_shape), rhs_exponent_bits, rhs_mantissa_bits
+      ).astype(rhs_in_jax_dtype)
     out_shape = jax.ShapeDtypeStruct((m, n), jax_out_dtype)
     if transpose_rhs_tiles:
       rhs_tiling_t = rhs_tiling[::-1] if rhs_transpose else rhs_tiling
